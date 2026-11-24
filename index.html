@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Olive &amp; Ember — Field-to-Table Kitchen</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+
+<!-- Fonts: Fraunces (display) + Inter (body) + JetBrains Mono (prices/labels) -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --olive-deep:#1F2B1A;
+    --olive-mid:#3B4A30;
+    --sage:#8A9B6E;
+    --paper:#F7F2E7;
+    --paper-dim:#EDE6D6;
+    --ember:#C1531B;
+    --ember-deep:#9A3F12;
+    --ink:#241F19;
+    --gold-line: rgba(193,83,27,.35);
+  }
+
+  *{ box-sizing:border-box; }
+
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    font-weight:400;
+    overflow-x:hidden;
+  }
+
+  /* paper grain texture */
+  body::before{
+    content:"";
+    position:fixed; inset:0;
+    z-index:9999;
+    pointer-events:none;
+    opacity:.045;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  h1,h2,h3,h4,h5,.display-font{
+    font-family:'Fraunces', serif;
+    letter-spacing:-.01em;
+  }
+
+  .mono{
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem;
+    letter-spacing:.22em;
+    text-transform:uppercase;
+    color:var(--ember);
+    display:inline-flex;
+    align-items:center;
+    gap:.6rem;
+  }
+  .eyebrow::before{
+    content:"";
+    width:18px; height:1px;
+    background:var(--ember);
+    display:inline-block;
+  }
+
+  a{ text-decoration:none; }
+
+  /*  NAVBAR  */
+  .navbar.olive-nav{
+    background:rgba(31,43,26,.92);
+    backdrop-filter: blur(10px);
+    padding-top:.85rem;
+    padding-bottom:.85rem;
+    border-bottom:1px solid rgba(247,242,231,.08);
+    transition: padding .3s ease, background .3s ease;
+  }
+  .navbar.olive-nav.scrolled{
+    padding-top:.45rem;
+    padding-bottom:.45rem;
+    background:rgba(31,43,26,.98);
+  }
+  .navbar-brand.brand-mark{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-style:italic;
+    font-size:1.5rem;
+    color:var(--paper) !important;
+    letter-spacing:.01em;
+  }
+  .navbar-brand.brand-mark span{ color:var(--sage); font-style:normal; }
+  .olive-nav .nav-link{
+    color:rgba(247,242,231,.78) !important;
+    font-size:.84rem;
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    font-weight:500;
+    margin:0 .65rem;
+    position:relative;
+    padding:.4rem 0 !important;
+  }
+  .olive-nav .nav-link::after{
+    content:"";
+    position:absolute; left:0; bottom:0;
+    width:0; height:1px;
+    background:var(--ember);
+    transition:width .25s ease;
+  }
+  .olive-nav .nav-link:hover::after{ width:100%; }
+  .olive-nav .nav-link:hover{ color:var(--paper) !important; }
+  .btn-reserve-nav{
+    background:var(--ember);
+    color:var(--paper);
+    border:1px solid var(--ember);
+    font-size:.8rem;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    padding:.5rem 1.3rem;
+    border-radius:2px;
+    font-weight:600;
+    transition:.25s ease;
+  }
+  .btn-reserve-nav:hover{
+    background:transparent;
+    color:var(--ember);
+  }
+
+  /*  HERO / CAROUSEL */
+  .hero-carousel{ height:100vh; min-height:560px; }
+  .hero-carousel .carousel-inner, .hero-carousel .carousel-item{ height:100%; }
+  .hero-slide{
+    height:100%;
+    position:relative;
+    background-size:cover;
+    background-position:center;
+  }
+  .hero-slide::after{
+    content:"";
+    position:absolute; inset:0;
+    background:linear-gradient(180deg, rgba(31,43,26,.55) 0%, rgba(31,43,26,.35) 40%, rgba(20,16,12,.85) 100%);
+  }
+  .hero-caption-wrap{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column;
+    align-items:flex-start; justify-content:center;
+    padding:0 8%;
+    z-index:2;
+  }
+  .hero-caption-wrap .eyebrow{ color:var(--sage); }
+  .hero-caption-wrap .eyebrow::before{ background:var(--sage); }
+  .hero-title{
+    color:var(--paper);
+    font-size:clamp(2.6rem, 6.5vw, 5.4rem);
+    font-weight:600;
+    line-height:1.02;
+    max-width:850px;
+    margin:.6rem 0 1rem;
+  }
+  .hero-title em{ font-style:italic; color:var(--ember); font-weight:500; }
+  .hero-sub{
+    color:rgba(247,242,231,.85);
+    font-size:1.1rem;
+    max-width:480px;
+    margin-bottom:1.8rem;
+  }
+  .btn-hero{
+    background:var(--paper);
+    color:var(--olive-deep);
+    border:none;
+    padding:.85rem 2rem;
+    font-weight:600;
+    letter-spacing:.03em;
+    border-radius:2px;
+    text-transform:uppercase;
+    font-size:.82rem;
+    transition:.25s ease;
+  }
+  .btn-hero:hover{ background:var(--ember); color:var(--paper); }
+  .btn-hero-ghost{
+    border:1px solid rgba(247,242,231,.5);
+    color:var(--paper);
+    padding:.85rem 2rem;
+    border-radius:2px;
+    text-transform:uppercase;
+    font-size:.82rem;
+    letter-spacing:.03em;
+    font-weight:600;
+    transition:.25s ease;
+  }
+  .btn-hero-ghost:hover{ background:rgba(247,242,231,.12); border-color:var(--paper); color:var(--paper); }
+
+  .hero-carousel .carousel-indicators{ margin-bottom:2.4rem; }
+  .hero-carousel .carousel-indicators [data-bs-target]{
+    width:7px; height:7px; border-radius:50%;
+    background-color:rgba(247,242,231,.5);
+    border:none; opacity:1;
+  }
+  .hero-carousel .carousel-indicators .active{ background-color:var(--ember); width:22px; border-radius:4px; }
+  .hero-carousel .carousel-control-prev, .hero-carousel .carousel-control-next{ width:6%; opacity:.6; }
+  .hero-carousel .carousel-control-prev:hover, .hero-carousel .carousel-control-next:hover{ opacity:1; }
+
+  .scroll-cue{
+    position:absolute; bottom:1.6rem; right:6%;
+    z-index:3; color:var(--paper); opacity:.7;
+    font-family:'JetBrains Mono', monospace; font-size:.7rem;
+    letter-spacing:.15em; text-transform:uppercase;
+    display:flex; align-items:center; gap:.6rem;
+  }
+  .scroll-cue .line{ width:1px; height:34px; background:rgba(247,242,231,.45); position:relative; overflow:hidden; }
+  .scroll-cue .line::after{
+    content:""; position:absolute; top:0; left:0; width:100%; height:40%;
+    background:var(--ember);
+    animation:scrollDrip 1.8s ease-in-out infinite;
+  }
+  @keyframes scrollDrip{ 0%{ top:-40%; } 100%{ top:100%; } }
+
+  /*  SECTION HEADERS  */
+  .section-pad{ padding:6.5rem 0; }
+  .section-head{ max-width:640px; margin-bottom:3.2rem; }
+  .section-head h2{
+    font-size:clamp(2rem,4vw,3rem);
+    font-weight:500;
+    color:var(--olive-deep);
+    margin:.5rem 0 .9rem;
+  }
+  .section-head p{ color:#5b5246; font-size:1.05rem; }
+  .bg-deep{ background:var(--olive-deep); color:var(--paper); }
+  .bg-deep .section-head p{ color:rgba(247,242,231,.72); }
+  .bg-deep .section-head h2{ color:var(--paper); }
+
+  /*  MENU CARDS  */
+  .menu-card{
+    background:#fff;
+    border:1px solid rgba(36,31,25,.08);
+    border-radius:3px;
+    overflow:hidden;
+    transition:transform .35s ease, box-shadow .35s ease;
+    height:100%;
+  }
+  .menu-card:hover{
+    transform:translateY(-7px);
+    box-shadow:0 22px 40px -16px rgba(31,43,26,.35);
+  }
+  .menu-card .img-wrap{ position:relative; overflow:hidden; height:230px; }
+  .menu-card .img-wrap img{
+    width:100%; height:100%; object-fit:cover;
+    transition:transform .6s ease;
+  }
+  .menu-card:hover .img-wrap img{ transform:scale(1.08); }
+  .menu-tag{
+    position:absolute; top:.9rem; left:.9rem;
+    background:rgba(31,43,26,.85);
+    color:var(--sage);
+    font-family:'JetBrains Mono', monospace;
+    font-size:.66rem; letter-spacing:.12em; text-transform:uppercase;
+    padding:.3rem .65rem;
+    border-radius:2px;
+  }
+  .menu-card .card-body{ padding:1.5rem 1.4rem 1.6rem; }
+  .menu-card h5{
+    font-weight:500; font-size:1.2rem;
+    color:var(--olive-deep);
+    margin-bottom:.55rem;
+  }
+  .menu-card .desc{ color:#6b6256; font-size:.92rem; line-height:1.55; margin-bottom:1.1rem; }
+  .price-row{
+    display:flex; align-items:baseline; justify-content:space-between;
+    border-top:1px dashed var(--gold-line);
+    padding-top:.85rem;
+  }
+  .price{
+    font-family:'JetBrains Mono', monospace;
+    font-size:1.15rem; font-weight:600;
+    color:var(--ember-deep);
+  }
+  .btn-order{
+    border:1px solid var(--olive-deep);
+    color:var(--olive-deep);
+    background:transparent;
+    font-size:.74rem; letter-spacing:.06em; text-transform:uppercase;
+    padding:.4rem 1rem; border-radius:2px; font-weight:600;
+    transition:.2s ease;
+  }
+  .btn-order:hover{ background:var(--olive-deep); color:var(--paper); }
+
+  /*  ABOUT  */
+  .about-img-wrap{ position:relative; }
+  .about-img-wrap img{
+    width:100%; border-radius:3px;
+    box-shadow:0 30px 60px -25px rgba(31,43,26,.45);
+  }
+  .about-stamp{
+    position:absolute; bottom:-1.6rem; left:-1.6rem;
+    background:var(--ember);
+    color:var(--paper);
+    width:118px; height:118px;
+    border-radius:50%;
+    display:flex; flex-direction:column;
+    align-items:center; justify-content:center;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    box-shadow:0 18px 30px -12px rgba(154,63,18,.55);
+  }
+  .about-stamp .num{ font-family:'Fraunces',serif; font-size:1.8rem; font-weight:600; line-height:1; }
+  .about-stamp .lbl{ font-size:.6rem; letter-spacing:.08em; text-transform:uppercase; margin-top:.2rem; }
+
+  .about-list{ list-style:none; padding:0; margin:1.6rem 0 2rem; }
+  .about-list li{
+    display:flex; align-items:flex-start; gap:.75rem;
+    padding:.55rem 0;
+    border-bottom:1px solid rgba(36,31,25,.08);
+    font-size:.97rem;
+  }
+  .about-list li i{ color:var(--ember); font-size:1rem; margin-top:.15rem; }
+
+  /*  RESERVATION CTA STRIP  */
+  .reserve-strip{
+    background:
+      radial-gradient(circle at 15% 30%, rgba(193,83,27,.18), transparent 45%),
+      var(--olive-deep);
+    border-top:1px solid rgba(247,242,231,.08);
+    border-bottom:1px solid rgba(247,242,231,.08);
+    padding:4.5rem 0;
+  }
+  .reserve-strip h3{
+    color:var(--paper); font-weight:500;
+    font-size:clamp(1.7rem,3.4vw,2.5rem);
+  }
+  .reserve-strip p{ color:rgba(247,242,231,.7); }
+  .btn-ember{
+    background:var(--ember); border:1px solid var(--ember); color:var(--paper);
+    padding:.95rem 2.3rem; border-radius:2px; font-weight:600;
+    letter-spacing:.04em; text-transform:uppercase; font-size:.85rem;
+    transition:.25s ease; white-space:nowrap;
+  }
+  .btn-ember:hover{ background:transparent; color:var(--ember); }
+
+  /*  MODAL  */
+  .modal-content.reserve-modal{
+    background:var(--paper);
+    border:none; border-radius:4px;
+    overflow:hidden;
+  }
+  .reserve-modal .modal-header{
+    background:var(--olive-deep);
+    border-bottom:none;
+    padding:1.6rem 1.8rem;
+  }
+  .reserve-modal .modal-title{
+    color:var(--paper); font-weight:500; font-size:1.5rem;
+  }
+  .reserve-modal .modal-title small{
+    display:block; font-family:'JetBrains Mono',monospace;
+    font-size:.68rem; letter-spacing:.15em; text-transform:uppercase;
+    color:var(--sage); margin-bottom:.3rem; font-weight:400;
+  }
+  .reserve-modal .btn-close{ filter:invert(1) grayscale(1) brightness(2); }
+  .reserve-modal .modal-body{ padding:1.9rem 1.8rem; }
+  .reserve-modal .form-label{
+    font-size:.74rem; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--olive-mid); font-weight:600; margin-bottom:.4rem;
+  }
+  .reserve-modal .form-control, .reserve-modal .form-select{
+    background:#fff;
+    border:1px solid rgba(36,31,25,.18);
+    border-radius:2px;
+    padding:.65rem .85rem;
+    font-size:.95rem;
+  }
+  .reserve-modal .form-control:focus, .reserve-modal .form-select:focus{
+    border-color:var(--ember);
+    box-shadow:0 0 0 3px rgba(193,83,27,.15);
+  }
+  .reserve-modal .modal-footer{ border-top:1px solid rgba(36,31,25,.1); padding:1.2rem 1.8rem; }
+  .btn-cancel-ghost{
+    background:transparent; border:1px solid rgba(36,31,25,.25); color:var(--ink);
+    padding:.6rem 1.4rem; border-radius:2px; font-size:.85rem; font-weight:600;
+  }
+
+  /*  FOOTER  */
+  footer.site-footer{ background:#162011; color:rgba(247,242,231,.75); padding:4.5rem 0 0; }
+  .site-footer h6{
+    font-family:'JetBrains Mono', monospace;
+    font-size:.72rem; letter-spacing:.16em; text-transform:uppercase;
+    color:var(--sage); margin-bottom:1.1rem;
+  }
+  .site-footer .brand-mark{ font-size:1.6rem; }
+  .site-footer p, .site-footer li{ font-size:.92rem; line-height:1.7; }
+  .site-footer a.plain{ color:rgba(247,242,231,.75); transition:.2s ease; }
+  .site-footer a.plain:hover{ color:var(--ember); }
+  .hours-row{ display:flex; justify-content:space-between; padding:.3rem 0; border-bottom:1px dashed rgba(247,242,231,.12); font-size:.88rem; }
+  .hours-row span:last-child{ font-family:'JetBrains Mono',monospace; color:var(--sage); }
+  .social-row{ display:flex; gap:.7rem; margin-top:1.1rem; }
+  .social-row a{
+    width:38px; height:38px; border-radius:50%;
+    border:1px solid rgba(247,242,231,.2);
+    display:flex; align-items:center; justify-content:center;
+    color:var(--paper); transition:.25s ease;
+  }
+  .social-row a:hover{ background:var(--ember); border-color:var(--ember); transform:translateY(-3px); }
+  .footer-bottom{
+    margin-top:3rem; padding:1.4rem 0;
+    border-top:1px solid rgba(247,242,231,.08);
+    font-size:.78rem; color:rgba(247,242,231,.45);
+    font-family:'JetBrains Mono', monospace;
+  }
+
+  @media (max-width: 767px){
+    .about-stamp{ width:92px; height:92px; left:1rem; bottom:-1.2rem; }
+    .section-pad{ padding:4.2rem 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:.001ms !important; transition-duration:.001ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<!--  TODO 1: NAVBAR  -->
+<nav class="navbar navbar-expand-lg olive-nav fixed-top" id="mainNav">
+  <div class="container">
+    <a class="navbar-brand brand-mark" href="#home">Olive <span>&amp; Ember</span></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Toggle navigation" style="filter:invert(1) grayscale(1) brightness(2);">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navMenu">
+      <ul class="navbar-nav ms-auto align-items-lg-center">
+        <li class="nav-item"><a class="nav-link" href="#home">Home</a></li>
+        <li class="nav-item"><a class="nav-link" href="#menu">Menu</a></li>
+        <li class="nav-item"><a class="nav-link" href="#about">Our Story</a></li>
+        <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
+        <li class="nav-item ms-lg-3 mt-2 mt-lg-0">
+          <a class="btn-reserve-nav" href="#" data-bs-toggle="modal" data-bs-target="#reserveModal">Reserve</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!--  TODO 2: HERO CAROUSEL  -->
+<header id="home">
+  <div id="heroCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
+
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+
+    <div class="carousel-inner">
+
+      <div class="carousel-item active">
+        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1600891964092-4316c288032e?w=1600&h=1000&fit=crop');">
+          <div class="hero-caption-wrap">
+            <span class="eyebrow">Open daily · Wood-fired kitchen</span>
+            <h1 class="hero-title">Slow food, <em>cooked&nbsp;loud.</em></h1>
+            <p class="hero-sub">Olive oil pressed twenty minutes from our door, bread proofed for a day, and a fire that never goes out.</p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="#menu" class="btn-hero">View the menu</a>
+              <a href="#" class="btn-hero-ghost" data-bs-toggle="modal" data-bs-target="#reserveModal">Book a table</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=1600&h=1000&fit=crop');">
+          <div class="hero-caption-wrap">
+            <span class="eyebrow">Chef's selection</span>
+            <h1 class="hero-title">Ingredients <em>that talk back.</em></h1>
+            <p class="hero-sub">We build every plate from what the market gave us that morning — nothing frozen, nothing flown in from far.</p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="#menu" class="btn-hero">View the menu</a>
+              <a href="#" class="btn-hero-ghost" data-bs-toggle="modal" data-bs-target="#reserveModal">Book a table</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-item">
+        <div class="hero-slide" style="background-image:url('https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1600&h=1000&fit=crop');">
+          <div class="hero-caption-wrap">
+            <span class="eyebrow">The dining room</span>
+            <h1 class="hero-title">Pull a chair, <em>stay&nbsp;a while.</em></h1>
+            <p class="hero-sub">Low light, long tables, and a room built for conversations that outlast dessert.</p>
+            <div class="d-flex flex-wrap gap-3">
+              <a href="#menu" class="btn-hero">View the menu</a>
+              <a href="#" class="btn-hero-ghost" data-bs-toggle="modal" data-bs-target="#reserveModal">Book a table</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+
+    <div class="scroll-cue"><div class="line"></div> Scroll</div>
+  </div>
+</header>
+
+<!--  TODO 3: MENU SECTION  -->
+<section id="menu" class="section-pad">
+  <div class="container">
+    <div class="section-head">
+      <span class="eyebrow">The menu</span>
+      <h2>Six plates we'd never take off.</h2>
+      <p>Everything below started as a staff-meal experiment. The ones that made the chefs go quiet stayed on the menu — for years, in some cases.</p>
+    </div>
+
+    <div class="row g-4">
+
+      <!-- Card 1 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500&h=350&fit=crop" alt="Mediterranean salad with feta, olives, and sun-dried tomatoes" loading="lazy">
+            <span class="menu-tag">Starter</span>
+          </div>
+          <div class="card-body">
+            <h5>Olive Grove Salad</h5>
+            <p class="desc">Wild greens, barrel-aged feta, Nabali olives, and sun-dried tomatoes under a slow balsamic reduction.</p>
+            <div class="price-row">
+              <span class="price">$12.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=500&h=350&fit=crop" alt="Margherita pizza with fresh mozzarella and basil" loading="lazy">
+            <span class="menu-tag">Wood-fired</span>
+          </div>
+          <div class="card-body">
+            <h5>Margherita, Honest Style</h5>
+            <p class="desc">San Marzano sauce, fresh mozzarella torn by hand, basil added after the fire — not before.</p>
+            <div class="price-row">
+              <span class="price">$16.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1558030006-450675393462?w=500&h=350&fit=crop" alt="Grilled ribeye steak with roasted vegetables" loading="lazy">
+            <span class="menu-tag">From the grill</span>
+          </div>
+          <div class="card-body">
+            <h5>Ember-Grilled Ribeye</h5>
+            <p class="desc">Dry-aged 28 days, finished over open coals, served with roasted root vegetables and herb butter.</p>
+            <div class="price-row">
+              <span class="price">$34.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1563379926898-05f4575a45d8?w=500&h=350&fit=crop" alt="Handmade fettuccine pasta with truffle cream sauce" loading="lazy">
+            <span class="menu-tag">Handmade</span>
+          </div>
+          <div class="card-body">
+            <h5>Black Truffle Fettuccine</h5>
+            <p class="desc">Pasta rolled fresh each morning, tossed in truffle cream, finished tableside with parmesan shavings.</p>
+            <div class="price-row">
+              <span class="price">$22.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1551218808-94e220e084d2?w=500&h=350&fit=crop" alt="Pan-seared salmon with lemon dill sauce and asparagus" loading="lazy">
+            <span class="menu-tag">From the sea</span>
+          </div>
+          <div class="card-body">
+            <h5>Pan-Seared Atlantic Salmon</h5>
+            <p class="desc">Crisp-skinned salmon, bright lemon-dill sauce, charred asparagus, and a warm quinoa pilaf.</p>
+            <div class="price-row">
+              <span class="price">$28.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6 -->
+      <div class="col-lg-4 col-md-6 col-12">
+        <div class="menu-card">
+          <div class="img-wrap">
+            <img src="https://images.unsplash.com/photo-1551024506-0bccd828d307?w=500&h=350&fit=crop" alt="Chocolate lava cake with vanilla ice cream" loading="lazy">
+            <span class="menu-tag">Dessert</span>
+          </div>
+          <div class="card-body">
+            <h5>Molten Chocolate Cake</h5>
+            <p class="desc">Dark chocolate cake with a slow-poured molten center, served warm beside vanilla bean ice cream.</p>
+            <div class="price-row">
+              <span class="price">$10.99</span>
+              <a href="#" class="btn-order">Add to order</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!--  TODO 4: ABOUT SECTION  -->
+<section id="about" class="section-pad bg-deep">
+  <div class="container">
+    <div class="row align-items-center g-5">
+
+      <div class="col-md-6 order-md-2">
+        <span class="eyebrow">Since 2015</span>
+        <h2>A kitchen built around one fire, not six burners.</h2>
+        <p style="color:rgba(247,242,231,.75); font-size:1.02rem; line-height:1.7;">
+          Olive &amp; Ember started as a single wood-fired oven in a borrowed courtyard. Eleven years later, the oven is still the center of the room — everything else was built around it. Our chef, with two decades behind the line, treats the menu less like a list and more like a living document: it changes when the market does.
+        </p>
+        <p style="color:rgba(247,242,231,.75); font-size:1.02rem; line-height:1.7;">
+          We buy from three local growers by name, not by invoice number, and we close the kitchen rather than serve something we wouldn't eat ourselves.
+        </p>
+
+        <ul class="about-list">
+          <li><i class="bi bi-check2"></i> Ingredients sourced within 30 miles, daily</li>
+          <li><i class="bi bi-check2"></i> Twenty years of kitchen experience leading the line</li>
+          <li><i class="bi bi-check2"></i> A dining room built for long, unhurried tables</li>
+          <li><i class="bi bi-check2"></i> Private fire-side dining available on request</li>
+        </ul>
+
+        <a href="#contact" class="btn-hero-ghost">Plan a visit</a>
+      </div>
+
+      <div class="col-md-6 order-md-1">
+        <div class="about-img-wrap">
+          <img src="https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=700&h=520&fit=crop" alt="Interior of the Olive and Ember dining room" loading="lazy">
+          <div class="about-stamp">
+            <span class="num">11</span>
+            <span class="lbl">Years&nbsp;firing</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!--  RESERVATION CTA STRIP  -->
+<section class="reserve-strip">
+  <div class="container">
+    <div class="row align-items-center g-4">
+      <div class="col-lg-8">
+        <span class="eyebrow">Tables are limited</span>
+        <h3>Save your seat by the fire tonight.</h3>
+        <p class="mb-0">We hold a handful of walk-in spots, but the good seats go to whoever books first.</p>
+      </div>
+      <div class="col-lg-4 text-lg-end">
+        <a href="#" class="btn-ember" data-bs-toggle="modal" data-bs-target="#reserveModal">Reserve a table</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!--  TODO 5: RESERVATION MODAL  -->
+<div class="modal fade" id="reserveModal" tabindex="-1" aria-labelledby="reserveModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content reserve-modal">
+      <div class="modal-header">
+        <div>
+          <small>Table reservation</small>
+          <h5 class="modal-title" id="reserveModalLabel">Reserve your table</h5>
+        </div>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form id="reservationForm" novalidate>
+          <div class="row g-3">
+
+            <div class="col-md-6">
+              <label for="resName" class="form-label">Full name</label>
+              <input type="text" class="form-control" id="resName" placeholder="Jordan Avery" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="resEmail" class="form-label">Email</label>
+              <input type="email" class="form-control" id="resEmail" placeholder="you@example.com" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="resPhone" class="form-label">Phone</label>
+              <input type="tel" class="form-control" id="resPhone" placeholder="+970 8 123 4567" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="resGuests" class="form-label">Number of guests</label>
+              <select class="form-select" id="resGuests" required>
+                <option value="" selected disabled>Choose…</option>
+                <option>1 Guest</option>
+                <option>2 Guests</option>
+                <option selected>3–4 Guests</option>
+                <option>5–6 Guests</option>
+                <option>7+ Guests</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label for="resDate" class="form-label">Date</label>
+              <input type="date" class="form-control" id="resDate" required>
+            </div>
+
+            <div class="col-md-6">
+              <label for="resTime" class="form-label">Time</label>
+              <input type="time" class="form-control" id="resTime" required>
+            </div>
+
+            <div class="col-12">
+              <label for="resNotes" class="form-label">Special requests</label>
+              <textarea class="form-control" id="resNotes" rows="3" placeholder="Allergies, occasions, seating preference…"></textarea>
+            </div>
+
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn-cancel-ghost" data-bs-dismiss="modal">Cancel</button>
+        <button type="submit" form="reservationForm" class="btn-ember">Confirm reservation</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--  TODO 6: FOOTER  -->
+<footer class="site-footer" id="contact">
+  <div class="container">
+    <div class="row g-5">
+
+      <div class="col-lg-4 col-md-12">
+        <a href="#home" class="brand-mark navbar-brand">Olive <span>&amp; Ember</span></a>
+        <p class="mt-3" style="max-width:320px;">A wood-fired kitchen built on local ingredients, slow technique, and a room worth lingering in.</p>
+        <div class="social-row">
+          <a href="#" aria-label="Facebook"><i class="bi bi-facebook"></i></a>
+          <a href="#" aria-label="Instagram"><i class="bi bi-instagram"></i></a>
+          <a href="#" aria-label="Twitter"><i class="bi bi-twitter-x"></i></a>
+        </div>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <h6>Find us</h6>
+        <p class="mb-2"><i class="bi bi-geo-alt me-2"></i>123 Gourmet Street<br><span class="ms-4">Gaza City, Palestine</span></p>
+        <p class="mb-2"><i class="bi bi-telephone me-2"></i><a href="tel:+970567174246" class="plain">+970 567174246</a></p>
+        <p class="mb-0"><i class="bi bi-envelope me-2"></i><a href="mailto:m429696903@gmail.com" class="plain">m429696903@gmail.com</a></p>
+      </div>
+
+      <div class="col-lg-4 col-md-6">
+        <h6>Opening hours</h6>
+        <div class="hours-row"><span>Monday – Friday</span><span>11:00 – 22:00</span></div>
+        <div class="hours-row"><span>Saturday</span><span>10:00 – 23:00</span></div>
+        <div class="hours-row"><span>Sunday</span><span>10:00 – 21:00</span></div>
+      </div>
+
+    </div>
+
+    <div class="footer-bottom text-center">
+      © 2026 Olive &amp; Ember. All rights reserved. — Designed and built by Engineer Yousef Ashour.
+    </div>
+  </div>
+</footer>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+  // Navbar shrink on scroll
+  const nav = document.getElementById('mainNav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  });
+
+  // Reservation form -> simple validation + confirmation, then close modal
+  const form = document.getElementById('reservationForm');
+  form.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(!form.checkValidity()){
+      form.reportValidity();
+      return;
+    }
+    const modalEl = document.getElementById('reserveModal');
+    bootstrap.Modal.getInstance(modalEl).hide();
+    setTimeout(() => alert('Thanks! Your table request has been sent — we will confirm by email shortly.'), 300);
+    form.reset();
+  });
+</script>
+</body>
+</html>
